@@ -1,0 +1,175 @@
+class Estudiante:
+    def __init__(self, nombre, apellido, codigo, edad):
+        self.nombre = nombre
+        self.apellido = apellido
+        self.codigo = codigo
+        self.edad = edad
+
+class Profesor:
+    def __init__(self, nombre, apellido, codigo, especialidad):
+        self.nombre = nombre
+        self.apellido = apellido
+        self.codigo = codigo
+        self.especialidad = especialidad
+
+class Materia:
+    def __init__(self, codigo, nombre, horario, profesor):
+        self.codigo = codigo
+        self.nombre = nombre
+        self.horario = horario
+        self.profesor = profesor
+        self.matricula = []
+ 
+class Matricula:
+    def __init__(self, estudiante, materia):
+        self.estudiante = estudiante
+        self.materia = materia
+
+class BuscadorMateria:
+    def buscar_materia(self, codigo, lista_materias):
+        for materia in lista_materias:
+            if materia.codigo == codigo:
+                return materia
+        return None
+
+class BuscadorEstudiante:
+    def buscar_estudiante(self, codigo, lista_estudiantes):
+        for estudiante in lista_estudiantes:
+            if estudiante.codigo == codigo:
+                return estudiante
+        return None
+
+class Matriculador:
+    def matricular_estudiante(self, estudiante, codigo_materia, lista_materias):
+        buscador = BuscadorMateria()
+        materia = buscador.buscar_materia(codigo_materia, lista_materias)
+        if materia is not None:
+            matricula = Matricula(estudiante, materia)
+            materia.matricula.append(matricula)
+            print(f"El estudiante {estudiante.nombre} {estudiante.apellido} ha sido matriculado en la materia {materia.nombre}.")
+        else:
+            print("La materia no existe.")
+
+class AdministradorMaterias:
+    def __init__(self):
+        self.__lista_materias = []
+
+    def agregar_materia(self, codigo, nombre, horario, profesor):
+        nuevo_profesor = Profesor(profesor)
+        nueva_materia = Materia(codigo, nombre, horario, nuevo_profesor)
+        self.__lista_materias.append(nueva_materia)
+        print(f"Se ha agregado la materia {nombre}.")
+
+    def editar_materia(self, codigo, nombre, horario, profesor):
+        buscador = BuscadorMateria()
+        materia = buscador.buscar_materia(codigo, self.lista_materias)
+        if materia is not None:
+            nuevo_profesor = Profesor(profesor)
+            materia.asignarNombre = nombre
+            materia.asignarHorario = horario
+            materia.asignarProfesor = nuevo_profesor
+            print(f"La materia {codigo} ha sido actualizada.")
+        else:
+            print("La materia no existe.")
+
+    def eliminar_materia(self, codigo):
+        buscador = BuscadorMateria()
+        materia = buscador.buscar_materia(codigo, self.lista_materias)
+        if materia is not None:
+            self.lista_materias.remove(materia)
+            print(f"\nLa materia {materia.nombre} ha sido eliminada.")
+        else:
+            print("\nLa materia no existe.")
+    
+    def obtener_materia(self, codigo):
+        buscador = BuscadorMateria()
+        materia = buscador.buscar_materia(codigo, self.__lista_materias)
+        if materia is not None:
+            return self.__lista_materias[codigo]
+        else:
+            raise KeyError("Key not found in database.")
+
+class AdministradorEstudiantes:
+    def __init__(self):
+        self.lista_estudiantes = {}
+
+    def agregar_estudiante(self, nombre, apellido, codigo, edad):
+        nuevo_estudiante = Estudiante(nombre, apellido, codigo, edad)
+        self.lista_estudiantes[codigo] = nuevo_estudiante
+        print(f"\nSe ha agregado el estudiante: {nombre} a la base de datos.")
+    
+    def editar_estudiante(self, nombre, apellido, codigo, edad):
+        buscador = BuscadorEstudiante()
+        estudiante = buscador.buscar_estudiante(codigo, self.lista_estudiantes)
+        if estudiante is not None:
+            codigo = Materia(*codigo)
+            estudiante.nombre = nombre
+            estudiante.apellido = apellido
+            estudiante.edad = edad
+            print(f"El estudiante {codigo} - {nombre} ha sido actualizado.")
+        else:
+            print("El estudiante no exite.")
+    
+    def obtener_estudiante(self, codigo):
+        buscador = BuscadorEstudiante()
+        estudiante = buscador.buscar_estudiante(codigo, self.lista_estudiantes)
+        if estudiante is not None:
+            return self.lista_estudiantes[codigo]
+        else:
+            raise KeyError("Key not found in database.")
+
+    def delete_estudiante(self, codigo):
+        if codigo in self.data:
+            del self.lista_estudiantes[codigo]
+        else:
+            raise KeyError("Key not found in database.")
+
+def main():
+    db = AdministradorEstudiantes()
+    dbMaterias = AdministradorMaterias()
+
+    while True:
+        opcion = input("¿Desea agregar o obtener un dato? (agregar/editar/obtener/salir)")
+
+        if opcion == "agregar":
+            nombre = input("Ingrese la clave del dato: ")
+            apellido = input("Ingrese el valor del dato: ")
+            codigo = input("Ingrese el valor del dato: ")
+            edad = input("Ingrese el valor del dato: ")
+            db.agregar_estudiante(nombre, apellido, codigo, edad)
+
+        elif opcion == "editar":
+            codigo= input("Ingrese el codigo del estudiante a editar: ")
+            valor = db.obtener_estudiante(codigo)
+            codigo = Estudiante(*codigo)
+            nombre = input("Ingrese la clave del dato: ")
+            apellido = input("Ingrese el valor del dato: ")
+            edad = input("Ingrese el valor del dato: ")
+            db.editar_estudiante(nombre, apellido, codigo, edad)
+
+        elif opcion == "Ver":
+            codigo = input("Ingrese el codigo del estudiante a eliminar: ")
+            valor = db.obtener_estudiante(codigo)
+            db.delete_estudiante(codigo)
+            print(f"Se elimino exitosamente el estudiante: {valor}")
+
+        elif opcion == "salir":
+            main ()
+
+        elif opcion == "prueba":
+            codigo = input("Ingrese la clave del dato: ")
+            nombre = input("Ingrese el valor del dato: ")
+            horario = input("Ingrese el valor del dato: ")
+            profesor = Profesor("Lucho", "Torres", "1007429794", "Licensiado")
+            dbMaterias.agregar_materia(codigo, nombre, horario, profesor)
+        
+        elif opcion == "verM":
+            codigo = input("Ingrese el codigo del estudiante a eliminar: ")
+            valor = dbMaterias.obtener_materia(codigo)
+            print(valor)
+        
+        else:
+            print("Opción inválida")
+
+if __name__ == "__main__":
+    main()
